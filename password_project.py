@@ -1,8 +1,8 @@
 import streamlit as st 
 import string
 import random
-import os
 import time
+
 # Character groups
 lowercase = list(string.ascii_lowercase)
 uppercase = list(string.ascii_uppercase)
@@ -11,19 +11,15 @@ punctuation = list(string.punctuation)
 
 # Usage limit
 max_uses = 3
-if os.path.exists("mohamed.txt"):
-    with open("mohamed.txt", "r") as file:
-        content = file.read().strip()
-        if content.isdigit():
-            uses = int(content)
-        else:
-            uses = 0
-else:
-    uses = 0
+
+# Initialize session state for tracking uses
+if 'uses' not in st.session_state:
+    st.session_state.uses = 0
 
 st.title("🔐 Password Generator")
 
-if uses >= max_uses:
+# Check if the user has reached the maximum uses
+if st.session_state.uses >= max_uses:
     st.error("Access denied. You have already used this generator 3 times.")
 else:
     total_length = st.number_input("How many characters should the password have?", min_value=1, step=1)
@@ -55,12 +51,10 @@ else:
                 random.shuffle(password)
                 final_password = ''.join(password)
 
-                uses += 1
-                with open("mohamed.txt", "w") as file:
-                    file.write(str(uses))
+                # Increment the uses counter for the session
+                st.session_state.uses += 1
 
                 st.success(f"✅ Generated Password: `{final_password}`")
-                st.info(f"{max_uses - uses} uses remaining.")
+                st.info(f"{max_uses - st.session_state.uses} uses remaining.")
         else:
             st.warning(f"Total doesn't match {total_length}. Adjust the numbers.")
-
